@@ -8,7 +8,7 @@ Built with Angular 22 (zoneless, signals) inside Electron for the [DEV Presage S
 
 > Ctrl+Rest is a relaxation break, not a medical device. It doesn't diagnose, treat or monitor anything.
 
-**Demo video:** _coming soon_
+**Demo video:** [Watch Ctrl+Rest in action on YouTube](https://studio.youtube.com/video/7dRqiNo8VCk)
 
 | Start | Consent | Break | Mochi is asleep |
 | --- | --- | --- | --- |
