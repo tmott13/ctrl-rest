@@ -1,0 +1,387 @@
+<app-scene [theme]="theme()" [rate]="sceneRate()" [calm]="calm()" [still]="reducedMotion()" />
+<main class="app" [class.reduced-motion]="reducedMotion()" [attr.data-theme]="theme()">
+  @switch (screen()) {
+    @case ('welcome') {
+      <section class="card welcome" aria-labelledby="welcome-title">
+        <img
+          class="mochi-img hero wave"
+          src="mochi/mochi-wave.webp"
+          alt=""
+          width="120"
+          height="120"
+        />
+        <h1 id="welcome-title" #screenHeading tabindex="-1">Ctrl+Rest</h1>
+        <p class="tagline">Pause with Mochi. A short breathing break for your busy brain.</p>
+
+        <fieldset class="settings">
+          <legend>Your break</legend>
+
+          <div class="pair">
+            <div class="field">
+              <label for="minutes">Length</label>
+              <select
+                id="minutes"
+                [value]="minutes()"
+                (change)="setMinutes($any($event.target).value)"
+              >
+                <option value="2">2 minutes</option>
+                <option value="3">3 minutes</option>
+                <option value="5">5 minutes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="pace">Mochi's pace</label>
+              <select
+                id="pace"
+                [value]="guidePace()"
+                (change)="setPace($any($event.target).value)"
+                aria-describedby="pace-help"
+              >
+                <option value="5">Very slow, 5 per minute</option>
+                <option value="6">Slow, 6 per minute</option>
+                <option value="8">Easy, 8 per minute</option>
+                <option value="10">Gentle, 10 per minute</option>
+              </select>
+            </div>
+          </div>
+          <p id="pace-help" class="help small">
+            Follow along only if it feels good. There's no target.
+          </p>
+
+          <span class="label" id="theme-label">Scene</span>
+          <div class="themes" role="radiogroup" aria-labelledby="theme-label">
+            @for (t of themes; track t.id) {
+              <label class="theme-option" [class.selected]="theme() === t.id">
+                <input
+                  type="radio"
+                  name="theme"
+                  [value]="t.id"
+                  [checked]="theme() === t.id"
+                  (change)="setTheme(t.id)"
+                />
+                {{ t.name }}
+              </label>
+            }
+          </div>
+
+          <span class="label" id="sound-label">Sound</span>
+          <div class="sound-row">
+            <label class="check inline">
+              <input
+                type="checkbox"
+                [checked]="soundOn()"
+                (change)="toggleSound($any($event.target).checked)"
+              />
+              Calm sounds
+            </label>
+            <label class="volume" [class.disabled]="!soundOn()">
+              <span>Volume</span>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="5"
+                [value]="volume()"
+                [disabled]="!soundOn()"
+                (input)="setVolume($any($event.target).value)"
+                [attr.aria-valuetext]="volume() + ' percent'"
+              />
+            </label>
+          </div>
+
+          <div class="check-row">
+            @if (voice.supported) {
+              <label class="check">
+                <input
+                  type="checkbox"
+                  [checked]="spoken()"
+                  (change)="toggleSpoken($any($event.target).checked)"
+                  aria-describedby="spoken-help"
+                />
+                Spoken cues
+              </label>
+            }
+            <label class="check">
+              <input
+                type="checkbox"
+                [checked]="reducedMotion()"
+                (change)="reducedMotion.set($any($event.target).checked)"
+              />
+              Reduce motion
+            </label>
+          </div>
+          @if (voice.supported) {
+            @if (spoken()) {
+              <div class="voice-row">
+                <label for="voice">Voice</label>
+                <select
+                  id="voice"
+                  [value]="voice.selected()"
+                  (change)="voice.choose($any($event.target).value)"
+                >
+                  <option value="">Automatic (best available)</option>
+                  @for (v of voice.options(); track v.name) {
+                    <option [value]="v.name" [selected]="v.name === voice.selected()">
+                      {{ v.label }}
+                    </option>
+                  }
+                </select>
+                <button type="button" (click)="voice.preview()">Try it</button>
+              </div>
+            }
+            <p id="spoken-help" class="help small" [class.sr-only]="spoken()">
+              Spoken cues let you close your eyes. Using a screen reader? Try sounds off.
+            </p>
+          }
+        </fieldset>
+
+        <div class="actions">
+          @if (cameraReady()) {
+            <button class="primary" type="button" (click)="chooseCamera()">
+              Breathe with the camera
+            </button>
+          }
+          <button [class.primary]="!cameraReady()" type="button" (click)="begin('timer')">
+            Breathe without the camera
+          </button>
+        </div>
+
+        @if (!cameraReady()) {
+          <p class="help">
+            @if (inElectron) {
+              Camera mode needs your free Presage API key in a <code>.env</code> file. See the
+              README.
+            } @else {
+              Camera mode runs in the desktop app (<code>npm run app</code>).
+            }
+          </p>
+        }
+        <p class="help small">
+          <button class="link" type="button" (click)="begin('demo')">
+            Preview with simulated breathing
+          </button>
+          (for testing, no camera)
+        </p>
+      </section>
+    }
+
+    @case ('consent') {
+      <section class="card consent-card" aria-labelledby="consent-title">
+        <div class="hero-stack" [class.blinking]="blink()" aria-hidden="true">
+          <img class="mochi-img" src="mochi/mochi-awake.webp" alt="" width="120" height="120" />
+          <img
+            class="mochi-img blink"
+            src="mochi/mochi-blink.webp"
+            alt=""
+            width="120"
+            height="120"
+          />
+        </div>
+        <h1 id="consent-title" #screenHeading tabindex="-1">Before we turn on the camera</h1>
+        <ul class="consent">
+          <li>
+            <strong>What it reads:</strong> your breathing rate, from small movements in the camera
+            image.
+          </li>
+          <li>
+            <strong>Where it happens:</strong> on this computer. Video and images never leave your
+            device and are never saved.
+          </li>
+          <li>
+            <strong>What's kept:</strong> nothing. When the break ends, the readings are gone.
+          </li>
+          <li>
+            <strong>What goes online:</strong> only a check that the app's Presage API key is valid.
+            SDK telemetry is turned off.
+          </li>
+          <li>
+            <strong>When it's on:</strong> only during this break. You'll see "Camera on," and you
+            can stop anytime with Esc.
+          </li>
+          <li>
+            <strong>Not medical:</strong> this is a relaxation break, not a health measurement.
+          </li>
+        </ul>
+        <div class="actions">
+          <button class="primary" type="button" (click)="begin('camera')">
+            Turn on the camera
+          </button>
+          <button type="button" (click)="begin('timer')">No thanks, breathe without it</button>
+        </div>
+      </section>
+    }
+
+    @case ('session') {
+      <section class="session" aria-labelledby="session-title">
+        <header class="session-bar glass">
+          <h1 id="session-title" #screenHeading tabindex="-1">Breathe with Mochi</h1>
+          @if (kind() === 'camera') {
+            <span class="chip on" role="status">Camera on</span>
+          } @else if (kind() === 'demo') {
+            <span class="chip" role="status">Simulated breathing</span>
+          } @else {
+            <span class="chip" role="status">Camera off</span>
+          }
+          <span class="progress">Minute {{ minutesDone() + 1 }} of {{ minutes() }}</span>
+          <span class="spacer"></span>
+          <label class="check">
+            <input
+              type="checkbox"
+              [checked]="soundOn()"
+              (change)="toggleSound($any($event.target).checked)"
+            />
+            Sound
+          </label>
+          @if (voice.supported) {
+            <label class="check">
+              <input
+                type="checkbox"
+                [checked]="spoken()"
+                (change)="toggleSpoken($any($event.target).checked)"
+              />
+              Voice
+            </label>
+          }
+          @if (kind() === 'camera') {
+            <label class="check">
+              <input
+                type="checkbox"
+                [checked]="showPreview()"
+                (change)="showPreview.set($any($event.target).checked)"
+              />
+              Camera preview
+            </label>
+          }
+          <button type="button" (click)="end()">End break <kbd>Esc</kbd></button>
+        </header>
+
+        <div class="circles">
+          <figure class="circle-wrap">
+            <div
+              class="circle mochi-circle"
+              [style.--cycle.s]="60 / guidePace()"
+              aria-hidden="true"
+            >
+              <div
+                class="mochi-stack"
+                [class.drowsy]="drowsy()"
+                [class.blinking]="blink() && !drowsy() && !waving()"
+                [class.is-waving]="waving()"
+              >
+                <div class="mochi-nod" [class.nodding]="nodding()">
+                  <img
+                    class="mochi-img awake"
+                    src="mochi/mochi-awake.webp"
+                    alt=""
+                    width="150"
+                    height="150"
+                  />
+                  <img
+                    class="mochi-img blink"
+                    src="mochi/mochi-blink.webp"
+                    alt=""
+                    width="150"
+                    height="150"
+                  />
+                  <img
+                    class="mochi-img asleep"
+                    src="mochi/mochi-asleep.webp"
+                    alt=""
+                    width="150"
+                    height="150"
+                  />
+                  <img
+                    class="mochi-img waving"
+                    src="mochi/mochi-wave.webp"
+                    alt=""
+                    width="150"
+                    height="150"
+                  />
+                </div>
+              </div>
+              @if (waving()) {
+                <span class="hearts"><span>♥</span><span>♥</span><span>♥</span></span>
+              }
+            </div>
+            <figcaption>Mochi</figcaption>
+          </figure>
+
+          @if (kind() !== 'timer') {
+            <figure class="circle-wrap">
+              <div class="circle you-circle" [style.--cycle.s]="yourCycle()" aria-hidden="true">
+                @if (kind() === 'camera' && showPreview()) {
+                  <video #preview class="circle-video" autoplay muted playsinline></video>
+                }
+              </div>
+              <figcaption>You</figcaption>
+            </figure>
+          }
+        </div>
+
+        <div class="breath-stack glass">
+          <!-- Visual breathing cue (also the reduced-motion fallback). -->
+          <p class="cue" aria-hidden="true">
+            {{ phase() === 'in' ? 'Breathe in…' : 'Breathe out…' }}
+          </p>
+
+          @if (kind() !== 'timer') {
+            <p class="reading">
+              @if (breath.status() === 'error') {
+                <span class="error" role="alert">{{ breath.error() }}</span>
+              } @else if (roundedRate() !== null && breath.stable()) {
+                Your breathing: <strong>{{ roundedRate() }}</strong> breaths a minute
+              } @else {
+                Settling in. Your first reading takes about 30 seconds.
+              }
+            </p>
+            <p class="hint" aria-live="polite">{{ breath.hint() }}</p>
+            <p class="sr-only" aria-live="polite">{{ rateAnnouncement() }}</p>
+          }
+
+          <p class="caption">{{ themeInfo().caption }}</p>
+          @if (kind() !== 'timer') {
+            <p class="caption">Tip: smile at Mochi.</p>
+          }
+          <p class="sr-only" aria-live="polite">{{ smileAnnouncement() }}</p>
+          <p class="caption">
+            {{ soundCaption() }}
+            @if (spoken()) {
+              · Spoken cues on
+            }
+          </p>
+        </div>
+      </section>
+    }
+
+    @case ('done') {
+      <section class="card done" aria-labelledby="done-title">
+        <div class="hero-wrap" aria-hidden="true">
+          <img
+            class="mochi-img hero"
+            src="mochi/mochi-asleep.webp"
+            alt=""
+            width="120"
+            height="120"
+          />
+          <span class="zzz"><span>z</span><span>z</span><span>z</span></span>
+        </div>
+        <h1 id="done-title" #screenHeading tabindex="-1">Mochi is asleep</h1>
+        @if (kind() !== 'timer' && breath.firstStable() !== null && breath.lastStable() !== null) {
+          <p>
+            Your breathing went from about
+            <strong>{{ breath.firstStable()! | number: '1.0-0' }}</strong> to about
+            <strong>{{ breath.lastStable()! | number: '1.0-0' }}</strong> breaths a minute.
+          </p>
+        } @else {
+          <p>Nice work taking a pause.</p>
+        }
+        @if (kind() === 'camera') {
+          <p class="help">The camera is off, and nothing from this break was saved.</p>
+        }
+        <div class="actions">
+          <button class="primary" type="button" (click)="backToStart()">Back to start</button>
+        </div>
+      </section>
+    }
+  }
+</main>

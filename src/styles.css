@@ -1,0 +1,85 @@
+@import '@fontsource-variable/fredoka';
+@import '@fontsource-variable/nunito';
+
+/* Ctrl+Rest base theme. The beach, forest and rain themes will swap these tokens. */
+:root {
+  --bg: #1d2433;
+  --panel: #262f42;
+  --panel-glass: rgb(18 23 34 / 55%);
+  --text: #f3f1ec;
+  --muted: #dde1e8;
+  --line: rgb(255 255 255 / 22%);
+  --accent: #9fc9b5;
+  --on-accent: #14201b;
+  --focus: #ffd38a;
+  --live: #7be0a6;
+  --error: #ffb4a8;
+  --mochi-glow: rgb(255 214 170 / 35%);
+  --mochi-ring: #e8c39e;
+  --you-glow: rgb(159 201 181 / 35%);
+  --you-ring: #9fc9b5;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    'Nunito Variable',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+code {
+  font-size: 0.95em;
+}
+
+/* Fun, rounded headings; friendly, readable body. Both are bundled (no web requests). */
+h1,
+h2,
+legend,
+.cue,
+.reading strong {
+  font-family: 'Fredoka Variable', 'Nunito Variable', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Button and accent colors follow the scene. Dark text on light accents keeps contrast high. */
+[data-theme='rain'] {
+  --accent: #f2c48d; /* warm lamp glow */
+  --on-accent: #2a1d10;
+  --you-ring: #f2c48d;
+  --you-glow: rgb(242 196 141 / 35%);
+}
+
+[data-theme='beach'] {
+  --accent: #f7a98f; /* sunset coral */
+  --on-accent: #2e1510;
+  --you-ring: #f7a98f;
+  --you-glow: rgb(247 169 143 / 35%);
+  --mochi-ring: #ffd9a8;
+}
+
+[data-theme='forest'] {
+  --accent: #b5d97a; /* sunlit moss */
+  --on-accent: #17240b;
+  --you-ring: #b5d97a;
+  --you-glow: rgb(181 217 122 / 35%);
+}
+
+[data-theme='plain'] {
+  --accent: #9fc9b5;
+  --on-accent: #14201b;
+}

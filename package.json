@@ -1,0 +1,55 @@
+{
+  "name": "ctrl-rest",
+  "version": "1.0.0",
+  "description": "Ctrl+Rest: Pause with Mochi. A camera-based breathing break built with Angular, Electron and the Presage SmartSpectra SDK.",
+  "author": "Tanya Mott",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tmott13/ctrl-rest.git"
+  },
+  "keywords": [
+    "presage",
+    "smartspectra",
+    "breathing",
+    "accessibility",
+    "angular",
+    "electron",
+    "devchallenge"
+  ],
+  "main": "electron/main.cjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "private": true,
+  "packageManager": "npm@10.9.9",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "app": "ng build && electron .",
+    "dev": "concurrently -k -n ng,electron \"ng build --watch --configuration development\" \"wait-on dist/ctrl-rest/browser/index.html && electron .\"",
+    "watch": "ng build --watch --configuration development"
+  },
+  "dependencies": {
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@fontsource-variable/fredoka": "^5.3.0",
+    "@fontsource-variable/nunito": "^5.3.0",
+    "@smartspectra/node-sdk": "^3.5.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.7",
+    "@angular/cli": "^22.2.7",
+    "@angular/compiler-cli": "^22.2.0",
+    "concurrently": "^10.0.7",
+    "electron": "^45.3.2",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.2",
+    "wait-on": "^9.5.1"
+  }
+}
