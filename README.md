@@ -26,7 +26,7 @@ Built with Angular 22 (zoneless, signals) inside Electron for the [DEV Presage S
 - **Calm sounds, made in code** (Web Audio, no audio files): rain that softens, waves that swell on the inhale, a breeze with birds that quiet down as you settle.
 - **Spoken cues (optional):** "breathe in… breathe out" in your computer's own voice, with a voice picker.
 - **Smile at Mochi:** the SDK notices when you smile, and Mochi waves back with a few hearts.
-- **Mochi:** she waves hello, blinks, breathes from her belly, nods off near the end and falls asleep. The summary shows how your breathing changed ("from about 16 to about 9 breaths a minute"), and the camera turns off.
+- **Mochi:** he waves hello, blinks, breathes from his belly, nods off near the end and falls asleep. The summary shows how your breathing changed ("from about 16 to about 9 breaths a minute"), and the camera turns off.
 
 ## How it uses SmartSpectra
 
